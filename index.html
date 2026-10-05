@@ -86,12 +86,12 @@
             </span>
           </label>
           <p class="section-note" style="margin-top:6px;">プレイ中の写真をプロが撮影します。<br>ストロボ有無の選択可能で、アーティスト写真としても利用可能です。<br>何枚か撮影したうちの4枚納品となります。</p>
-        </div>
-      </div>
 
-      <div id="strobeWrap" class="hidden" style="margin-top:14px;">
-        <p class="section-note" style="margin-top:0;">撮影を希望された方のみ、ストロボ使用の希望をお選びください。</p>
-        <div class="radio-group" id="strobeGroup"></div>
+          <div id="strobeWrap" class="hidden" style="margin-top:12px;">
+            <p class="section-note" style="margin-top:0;">撮影を希望される場合は、ストロボの有無をお選びください。<span class="required-mark">※</span></p>
+            <div class="radio-group" id="strobeGroup"></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -128,19 +128,18 @@
       timeSlot: "entry.710749786",
       genre: "entry.456848154",
       recording: "entry.1094368247",
-      photo: "entry.92269619",
-      strobe: "entry.92269619"
+      photo: "entry.92269619"
     },
 
     // チェックボックス型の質問で、実際にフォームに設定されている選択肢の文言と
     // 完全に一致させてください(1文字でも違うと記録されません)
     RECORDING_CHOICE_TEXT: "希望する",
-    PHOTO_CHOICE_TEXT: "希望する",
 
-    // ストロボ希望の選択肢。label=画面表示、value=フォームの選択肢文言(完全一致)
-    STROBE_OPTIONS: [
-      { label: "あり", value: "あり" },
-      { label: "なし", value: "なし" }
+    // DJ中の撮影の選択肢(ストロボの有無を含む)。
+    // label=画面に出す名前、value=フォームの選択肢の文言(完全一致。半角の丸括弧と空白に注意)
+    PHOTO_OPTIONS: [
+      { label: "ストロボなし", value: "希望する (ストロボなし)" },
+      { label: "ストロボ有り", value: "希望する (ストロボ有り)" }
     ],
 
     EVENT_TITLE: "2026/10/14 Freee Booth予約",
@@ -191,7 +190,7 @@
   const formStatus = document.getElementById("formStatus");
 
   let selectedSlot = null;
-  let selectedStrobe = null;
+  let selectedPhotoOption = null;
 
   function setStatus(msg, kind) {
     formStatus.textContent = msg || "";
@@ -243,7 +242,7 @@
   // --- ストロボ選択肢の描画 ---
   function renderStrobeOptions() {
     strobeGroup.innerHTML = "";
-    CONFIG.STROBE_OPTIONS.forEach((opt, idx) => {
+    CONFIG.PHOTO_OPTIONS.forEach((opt, idx) => {
       const label = document.createElement("label");
       label.className = "radio-choice";
       const input = document.createElement("input");
@@ -251,7 +250,7 @@
       input.name = "strobe";
       input.value = opt.value;
       input.addEventListener("change", () => {
-        selectedStrobe = opt.value;
+        selectedPhotoOption = opt.value;
         strobeGroup.querySelectorAll(".radio-choice").forEach(el => el.classList.remove("selected"));
         label.classList.add("selected");
       });
@@ -296,6 +295,11 @@
       setStatus("希望時間帯を選択してください。", "error");
       return;
     }
+    const photoChecked = document.getElementById("optPhoto").checked;
+    if (photoChecked && !selectedPhotoOption) {
+      setStatus("撮影を希望する場合は、ストロボの有無を選択してください。", "error");
+      return;
+    }
 
     submitBtn.disabled = true;
     setStatus("送信しています…", "");
@@ -305,9 +309,8 @@
       [CONFIG.ENTRY.timeSlot]: selectedSlot,
       [CONFIG.ENTRY.genre]: document.getElementById("genre").value.trim(),
       [CONFIG.ENTRY.recording]: document.getElementById("optRecording").checked ? CONFIG.RECORDING_CHOICE_TEXT : "",
-      [CONFIG.ENTRY.photo]: document.getElementById("optPhoto").checked ? CONFIG.PHOTO_CHOICE_TEXT : "",
-      // 撮影を希望しない場合、ストロボ欄は明示的に"false"を送信する(未選択=空欄 にはしない)
-      [CONFIG.ENTRY.strobe]: document.getElementById("optPhoto").checked ? (selectedStrobe || "") : "false"
+      // 撮影を希望する場合のみ、選んだ選択肢(ストロボ有無を含む)を送る。希望しない場合は何も送らない
+      [CONFIG.ENTRY.photo]: photoChecked ? selectedPhotoOption : ""
     };
 
     try {
@@ -349,7 +352,7 @@
     } else {
       strobeWrapEl.classList.add("hidden");
       // 撮影を希望しない場合は選択状態をリセットする
-      selectedStrobe = null;
+      selectedPhotoOption = null;
       strobeGroup.querySelectorAll(".radio-choice").forEach(el => el.classList.remove("selected"));
       strobeGroup.querySelectorAll("input[type=radio]").forEach(el => { el.checked = false; });
     }
