@@ -118,7 +118,7 @@
   // ============================================================
   const CONFIG = {
     // Apps Scriptの「ウェブアプリのURL」(doGetが返すAPI)
-    WEBAPP_URL: "https://script.google.com/macros/s/AKfycbwe3R4I1l6doCZe4edVwY6FSeBtdKmdx8P-pKKtaxNYHz2b3yF4f7xdoZrKwVj-4Jvn/exec",
+    WEBAPP_URL: "https://script.google.com/macros/s/AKfycbzw08xhGSrLSRthLFRUQpSPkZG6RwWpzw6rsZ0DX3k_CfI1H4svMpv7G7VKzOcHENkI/exec",
     
     // 各質問のentry ID。調べ方は下記「entry IDの調べ方」を参照
     // ※ GoogleフォームのFORM_IDは、セキュリティ上の理由でApps Script側にのみ
@@ -318,7 +318,7 @@
           setStatus("入れ違いでその時間帯は埋まってしまいました。お手数ですが別の時間を選び直してください。", "error");
           selectedSlot = null;
           await loadSlots(); // 最新の空き状況を再取得して選び直してもらう
-}       } else {
+        } else {
           const detail = result && result.error ? String(result.error).slice(0, 80) : "unknown";
           setStatus("送信に失敗しました。時間をおいて再度お試しください。(" + detail + ")", "error");
           console.error("submit failed:", result);
