@@ -318,8 +318,10 @@
           setStatus("入れ違いでその時間帯は埋まってしまいました。お手数ですが別の時間を選び直してください。", "error");
           selectedSlot = null;
           await loadSlots(); // 最新の空き状況を再取得して選び直してもらう
-        } else {
-          setStatus("送信に失敗しました。時間をおいて再度お試しください。", "error");
+}       } else {
+          const detail = result && result.error ? String(result.error).slice(0, 80) : "unknown";
+          setStatus("送信に失敗しました。時間をおいて再度お試しください。(" + detail + ")", "error");
+          console.error("submit failed:", result);
         }
         submitBtn.disabled = false;
         return;
